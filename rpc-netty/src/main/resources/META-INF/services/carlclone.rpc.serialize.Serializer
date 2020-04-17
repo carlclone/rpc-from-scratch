@@ -1,0 +1,3 @@
+carlclone.rpc.serialize.impl.MetadataSerializer
+carlclone.rpc.serialize.impl.StringSerializer
+carlclone.rpc.serialize.impl.RpcRequestSerializer
