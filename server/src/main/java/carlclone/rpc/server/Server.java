@@ -32,6 +32,7 @@ public class Server {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
     public static void main(String [] args) throws Exception {
 
+
         //获取标准化的服务名   carlclone.rpc.hello.HelloService
         String serviceName = HelloService.class.getCanonicalName();
 
