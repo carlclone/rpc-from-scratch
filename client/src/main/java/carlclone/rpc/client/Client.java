@@ -44,7 +44,9 @@ public class Client {
             HelloService helloService = rpcAccessPoint.getRemoteService(uri, HelloService.class);
             logger.info("请求服务, name: {}...", name);
             String response = helloService.hello(name);
+            String response2 = helloService.hello2(name);
             logger.info("收到响应: {}.", response);
+            logger.info("收到响应: {}.", response2);
         }
 
 

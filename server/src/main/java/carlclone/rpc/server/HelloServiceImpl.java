@@ -30,4 +30,12 @@ public class HelloServiceImpl implements HelloService {
         logger.info("HelloServiceImpl返回: {}.", ret);
         return ret;
     }
+
+    @Override
+    public String hello2(String name) {
+        logger.info("HelloServiceImpl2222222收到: {}.", name);
+        String ret = "Hello, " + name;
+        logger.info("HelloServiceImpl2222222返回: {}.", ret);
+        return ret;
+    }
 }
