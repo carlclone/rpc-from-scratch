@@ -17,6 +17,7 @@ import carlclone.rpc.transport.Transport;
 import com.itranswarp.compiler.JavaStringCompiler;
 
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -27,8 +28,9 @@ public class DynamicStubFactory implements StubFactory{
     private final static String STUB_SOURCE_TEMPLATE =
             "package carlclone.rpc.client.stubs;\n" +
             "import carlclone.rpc.serialize.SerializeSupport;\n" +
-            "\n" +
-            "public class %s extends AbstractStub implements %s {\n" +
+            "\n" + "public class %s extends AbstractStub implements %s {\n";
+
+    private final static String METHOD_TEMPLATE =
             "    @Override\n" +
             "    public String %s(String arg) {\n" +
             "        return SerializeSupport.parse(\n" +
@@ -40,8 +42,9 @@ public class DynamicStubFactory implements StubFactory{
             "                        )\n" +
             "                )\n" +
             "        );\n" +
-            "    }\n" +
-            "}";
+            "    }\n" ;
+
+    private final static String CLOSED_TEMPLATE = "}";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -51,9 +54,18 @@ public class DynamicStubFactory implements StubFactory{
             String stubSimpleName = serviceClass.getSimpleName() + "Stub";
             String classFullName = serviceClass.getName();
             String stubFullName = "carlclone.rpc.client.stubs." + stubSimpleName;
-            String methodName = serviceClass.getMethods()[0].getName();
 
-            String source = String.format(STUB_SOURCE_TEMPLATE, stubSimpleName, classFullName, methodName, classFullName, methodName);
+            Method[] methods = serviceClass.getMethods();
+
+            String source = String.format(STUB_SOURCE_TEMPLATE, stubSimpleName, classFullName);
+
+            for (Method method : methods) {
+                String methodName = method.getName();
+                source+=String.format(METHOD_TEMPLATE, methodName, classFullName,methodName);
+            }
+
+            source+=CLOSED_TEMPLATE;
+
             // 编译源代码
             JavaStringCompiler compiler = new JavaStringCompiler();
             Map<String, byte[]> results = compiler.compile(stubSimpleName + ".java", source);
