@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * @author LiYue
@@ -30,13 +31,14 @@ import java.net.URI;
  */
 public class Client {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
-    public static void main(String [] args) throws IOException {
+    public static void main(String [] args) throws IOException, URISyntaxException {
         String serviceName = HelloService.class.getCanonicalName();
-        File tmpDirFile = new File(System.getProperty("java.io.tmpdir"));
-        File file = new File(tmpDirFile, "simple_rpc_name_service.data");
+//        File tmpDirFile = new File(System.getProperty("java.io.tmpdir"));
+//        File file = new File(tmpDirFile, "simple_rpc_name_service.data");
+        URI jdbcUri=new URI("jdbc:mysql://localhost:3306/test?user=root&password=root");
         String name = "Master MQ";
         try(RpcAccessPoint rpcAccessPoint = ServiceSupport.load(RpcAccessPoint.class)) {
-            NameService nameService = rpcAccessPoint.getNameService(file.toURI());
+            NameService nameService = rpcAccessPoint.getNameService(jdbcUri);
             assert nameService != null;
             URI uri = nameService.lookupService(serviceName);
             assert uri != null;

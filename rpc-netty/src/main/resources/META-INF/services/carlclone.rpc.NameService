@@ -1,1 +1,2 @@
 carlclone.rpc.nameservice.LocalFileNameService
+carlclone.rpc.nameservice.JdbcNameService
