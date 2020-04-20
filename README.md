@@ -1,4 +1,8 @@
+## 执行
 
+mvn package
+java -jar server/target/server-1.0-SNAPSHOT-jar-with-dependencies.jar
+java -jar client/target/client-1.0-SNAPSHOT-jar-with-dependencies.jar
 
 ## 作业
 
@@ -105,7 +109,7 @@ public interface HelloService {
 }
 ```
 
-
+```
 //查找到服务的远程地址
 URI uri = nameService.lookupService(serviceName);
 //获取代理类(Stub)
@@ -224,11 +228,11 @@ public class StringSerializer implements Serializer<String> {
         return String.class;
     }
 }
-
+```
 
 
 ### 网络通信
-
+```
 public interface Transport {
     /**
      * 发送请求命令
@@ -258,7 +262,7 @@ public class ResponseHeader extends Header {
     private String error;
     // ...
 }
-
+```
 
 
 
@@ -268,6 +272,7 @@ public class ResponseHeader extends Header {
 
 异步通信时 , 背压机制的实现和存在的必要性 , 相当于令牌分发和回收 , 在InFlightRequests类中,用信号量(类似锁)实现?
 
+```
 @Override
 public  CompletableFuture<Command> send(Command request) {
     // 构建返回值
@@ -289,7 +294,7 @@ public  CompletableFuture<Command> send(Command request) {
         completableFuture.completeExceptionally(t);
     }
     return completableFuture;
-    
+   ``` 
     
 
 ### 疑问
