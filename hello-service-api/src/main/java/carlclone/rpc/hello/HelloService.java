@@ -23,4 +23,6 @@ public interface HelloService {
     String hello(String name);
 
     String hello2(String name);
+
+    String hello3(String name1,String name2);
 }

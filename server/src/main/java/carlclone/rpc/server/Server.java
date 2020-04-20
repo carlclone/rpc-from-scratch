@@ -37,10 +37,10 @@ public class Server {
         String serviceName = HelloService.class.getCanonicalName();
 
         //由于是基于本地文件的注册中心, 先生成临时文件
-//        File tmpDirFile = new File(System.getProperty("java.io.tmpdir"));
-//        File file = new File(tmpDirFile, "simple_rpc_name_service.data");
+        File tmpDirFile = new File(System.getProperty("java.io.tmpdir"));
+        File file = new File(tmpDirFile, "simple_rpc_name_service.data");
 
-        URI jdbcUri=new URI("jdbc:mysql://localhost:3306/test?user=root&password=root");
+//        URI jdbcUri=new URI("jdbc:mysql://localhost:3306/test?user=root&password=root");
 
         //获取 HelloService 的实现实例
         HelloService helloService = new HelloServiceImpl();
@@ -57,7 +57,7 @@ public class Server {
         ) {
 
             //这里是注册服务的内容, nameService 是基于文件的
-            NameService nameService = rpcAccessPoint.getNameService(jdbcUri); //FileNameService , 传入文件的uri
+            NameService nameService = rpcAccessPoint.getNameService(file.toURI()); //FileNameService , 传入文件的uri
             assert nameService != null;
             logger.info("向RpcAccessPoint注册{}服务...", serviceName);
             //向 RPCAP 添加对应服务实例

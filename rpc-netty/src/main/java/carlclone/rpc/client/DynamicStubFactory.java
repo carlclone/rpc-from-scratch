@@ -25,26 +25,29 @@ import java.util.Map;
  * Date: 2019/9/27
  */
 public class DynamicStubFactory implements StubFactory{
+    //类模板
     private final static String STUB_SOURCE_TEMPLATE =
             "package carlclone.rpc.client.stubs;\n" +
-            "import carlclone.rpc.serialize.SerializeSupport;\n" +
-            "\n" + "public class %s extends AbstractStub implements %s {\n";
-
-    private final static String METHOD_TEMPLATE =
+                    "import carlclone.rpc.serialize.SerializeSupport;\n" +
+                    "\n" +
+                    "public class %s extends AbstractStub implements %s {\n" +
+                    "%s" +
+                    "}";
+    //方法模板
+    private final static String STUB_SOURCE_TEMPLATE2 =
             "    @Override\n" +
-            "    public String %s(String arg) {\n" +
-            "        return SerializeSupport.parse(\n" +
-            "                invokeRemote(\n" +
-            "                        new RpcRequest(\n" +
-            "                                \"%s\",\n" +
-            "                                \"%s\",\n" +
-            "                                SerializeSupport.serialize(arg)\n" +
-            "                        )\n" +
-            "                )\n" +
-            "        );\n" +
-            "    }\n" ;
-
-    private final static String CLOSED_TEMPLATE = "}";
+                    "    public %s %s( %s ) {\n" +
+                    "%s"+
+                    "        return SerializeSupport.parse(\n" +
+                    "                invokeRemote(\n" +
+                    "                        new RpcRequest(\n" +
+                    "                                \"%s\",\n" +
+                    "                                \"%s\",\n" +
+                    "                                arguments\n" +
+                    "                        )\n" +
+                    "                )\n" +
+                    "        );\n" +
+                    "    }\n";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -54,18 +57,37 @@ public class DynamicStubFactory implements StubFactory{
             String stubSimpleName = serviceClass.getSimpleName() + "Stub";
             String classFullName = serviceClass.getName();
             String stubFullName = "carlclone.rpc.client.stubs." + stubSimpleName;
+            StringBuilder methodSources=new StringBuilder();
 
             Method[] methods = serviceClass.getMethods();
-
-            String source = String.format(STUB_SOURCE_TEMPLATE, stubSimpleName, classFullName);
-
-            for (Method method : methods) {
+            for(Method method:methods){
+                String returnType = method.getReturnType().getTypeName();
                 String methodName = method.getName();
-                source+=String.format(METHOD_TEMPLATE, methodName, classFullName,methodName);
+                StringBuilder parameters=new StringBuilder();
+                StringBuilder fourthPlace=new StringBuilder();
+
+                int count=0;
+                Class<?>[] parameterTypes = method.getParameterTypes();
+                fourthPlace.append("Argument[] arguments=new Argument[").append(parameterTypes.length).append("];\n");
+                for(Class<?> parameter:parameterTypes){
+                    String name = parameter.getName();
+                    parameters.append(name).append(" arg").append(count).append(",");
+
+                    fourthPlace.append("arguments[").append(count).append("]=new Argument();\n");
+                    fourthPlace.append("arguments[").append(count).append("].setType(").append(name).append(".class);\n");
+                    fourthPlace.append("arguments[").append(count).append("].setValue(SerializeSupport.serialize(arg")
+                            .append(count).append("));\n");
+                    count++;
+                }
+                parameters.deleteCharAt(parameters.length()-1);
+
+
+                String methodSource=String.format(STUB_SOURCE_TEMPLATE2,returnType,
+                        methodName,parameters,fourthPlace,classFullName,methodName);
+                methodSources.append(methodSource);
             }
 
-            source+=CLOSED_TEMPLATE;
-
+            String source = String.format(STUB_SOURCE_TEMPLATE, stubSimpleName, classFullName,methodSources);
             // 编译源代码
             JavaStringCompiler compiler = new JavaStringCompiler();
             Map<String, byte[]> results = compiler.compile(stubSimpleName + ".java", source);

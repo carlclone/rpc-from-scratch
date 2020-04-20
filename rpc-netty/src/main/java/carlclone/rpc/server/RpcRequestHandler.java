@@ -14,6 +14,7 @@
 package carlclone.rpc.server;
 
 import carlclone.rpc.client.ServiceTypes;
+import carlclone.rpc.client.stubs.Argument;
 import carlclone.rpc.client.stubs.RpcRequest;
 import carlclone.rpc.serialize.SerializeSupport;
 import carlclone.rpc.spi.Singleton;
@@ -26,8 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author LiYue
@@ -48,9 +52,14 @@ public class RpcRequestHandler implements RequestHandler, ServiceProviderRegistr
             Object serviceProvider = serviceProviders.get(rpcRequest.getInterfaceName());
             if(serviceProvider != null) {
                 // 找到服务提供者，利用Java反射机制调用服务的对应方法
-                String arg = SerializeSupport.parse(rpcRequest.getSerializedArguments());
-                Method method = serviceProvider.getClass().getMethod(rpcRequest.getMethodName(), String.class);
-                String result = (String ) method.invoke(serviceProvider, arg);
+                Argument[] serializedArguments = rpcRequest.getSerializedArguments();
+                List<Class<?>> types = Arrays.stream(serializedArguments).map(Argument::getType).collect(Collectors.toList());
+                Class<?>[] typesArray=new Class[types.size()];
+                types.toArray(typesArray);
+                Object[] args = Arrays.stream(serializedArguments).map(Argument::getValue).map(SerializeSupport::parse).toArray();
+
+                Method method = serviceProvider.getClass().getMethod(rpcRequest.getMethodName(), typesArray);
+                String result = (String ) method.invoke(serviceProvider, args);
                 // 把结果封装成响应命令并返回
                 return new Command(new ResponseHeader(type(), header.getVersion(), header.getRequestId()), SerializeSupport.serialize(result));
             }
