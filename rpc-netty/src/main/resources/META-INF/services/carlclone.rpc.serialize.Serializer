@@ -1,3 +1,4 @@
 carlclone.rpc.serialize.impl.MetadataSerializer
 carlclone.rpc.serialize.impl.StringSerializer
 carlclone.rpc.serialize.impl.RpcRequestJsonSerializer
+carlclone.rpc.serialize.impl.ObjectJsonSerializer

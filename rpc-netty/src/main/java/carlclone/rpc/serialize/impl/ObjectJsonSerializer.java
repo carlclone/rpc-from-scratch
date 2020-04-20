@@ -6,7 +6,7 @@ import carlclone.rpc.serialize.Serializer;
 import java.nio.charset.StandardCharsets;
 
 
-public class JsonSerializer implements Serializer {
+public class ObjectJsonSerializer implements Serializer {
 
     @Override
     public int size(Object entry) {
