@@ -1,8 +1,9 @@
 ## 执行
-
+```
 mvn package
 java -jar server/target/server-1.0-SNAPSHOT-jar-with-dependencies.jar
 java -jar client/target/client-1.0-SNAPSHOT-jar-with-dependencies.jar
+```
 
 ## 作业
 
